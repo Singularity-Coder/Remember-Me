@@ -9,18 +9,18 @@
         android:end="0dp"
         android:start="0dp"
         android:top="0dp">
-        <shape android:shape="rectangle">
+        <shape android:shape="oval">
             <solid android:color="@color/purple_50" />
         </shape>
     </item>
 
     <item
-        android:width="48dp"
-        android:height="48dp"
-        android:bottom="16dp"
+        android:width="36dp"
+        android:height="36dp"
+        android:bottom="24dp"
         android:drawable="@drawable/ic_round_people_24"
-        android:end="16dp"
+        android:end="24dp"
         android:gravity="center"
-        android:start="16dp"
-        android:top="16dp" />
+        android:start="24dp"
+        android:top="24dp" />
 </layer-list>

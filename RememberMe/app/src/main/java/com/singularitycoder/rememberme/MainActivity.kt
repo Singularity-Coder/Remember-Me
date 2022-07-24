@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 // Sync Contacts - Worker
 // Sort list in alphabetic order
 // Alphabet strip
-// Custom square camera for group selfie videos for context, name, phone
+// Custom square camera for group selfie videos for context, name, phone, context field just in case u r not able to video it
 // Data migration
 // 10 sec videos
 // Default to selfie camera
