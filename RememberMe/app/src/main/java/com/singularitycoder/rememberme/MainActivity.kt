@@ -14,6 +14,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 // Sync Contacts - Worker
+// Sort list in alphabetic order
+// Alphabet strip
+// Custom square camera for group selfie videos for context, name, phone
+// Data migration
+// 10 sec videos
+// Default to selfie camera
+// Expanded card has video, name, phone, date added, call, message, whatsapp
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
