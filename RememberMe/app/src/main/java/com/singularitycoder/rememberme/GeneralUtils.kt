@@ -3,6 +3,7 @@ package com.singularitycoder.rememberme
 import android.Manifest
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.database.Cursor
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.net.Uri
 import android.provider.ContactsContract
+import android.provider.Settings
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -25,8 +27,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-const val DB_AUDIO_WEB = "db_contact"
-const val TABLE_WEB_PAGE = "table_contact"
+const val DB_CONTACT = "db_contact"
+const val TABLE_CONTACT = "table_contact"
 
 fun View.showSnackBar(
     message: String,
@@ -176,6 +178,13 @@ fun Context.getContacts(): List<Contact> {
         cursor?.close()
     }
     return list
+}
+
+fun Context.showPermissionSettings() {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", this@showPermissionSettings.packageName, null)
+    }
+    startActivity(intent)
 }
 
 enum class DateType(val value: String) {
