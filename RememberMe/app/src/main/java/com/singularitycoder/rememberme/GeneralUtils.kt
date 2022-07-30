@@ -7,16 +7,19 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
-import android.hardware.Camera
+import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +33,7 @@ import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+
 
 const val DB_CONTACT = "db_contact"
 const val TABLE_CONTACT = "table_contact"
@@ -209,22 +213,12 @@ fun doAfter(duration: Long, task: () -> Unit) {
 
 fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 
-fun openFrontFacingCameraGingerbread(): Camera? {
-    var cameraCount = 0
-    var cam: Camera? = null
-    val cameraInfo = Camera.CameraInfo()
-    cameraCount = Camera.getNumberOfCameras()
-    for (camIdx in 0 until cameraCount) {
-        Camera.getCameraInfo(camIdx, cameraInfo)
-        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            try {
-                cam = Camera.open(camIdx)
-            } catch (e: RuntimeException) {
-                println("Camera failed to open: $e")
-            }
-        }
-    }
-    return cam
+// https://stackoverflow.com/questions/44109057/get-video-thumbnail-from-uri
+@RequiresApi(Build.VERSION_CODES.O_MR1)
+fun Context.getVideoThumbnailBitmap(docUri: Uri): Bitmap? {
+    val mmr = MediaMetadataRetriever()
+    mmr.setDataSource(this, docUri)
+    return mmr.getScaledFrameAtTime(/* Time in Video */1000, MediaMetadataRetriever.OPTION_NEXT_SYNC, 128, 128)
 }
 
 enum class DateType(val value: String) {

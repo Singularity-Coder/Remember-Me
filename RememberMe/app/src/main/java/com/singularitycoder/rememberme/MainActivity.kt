@@ -2,7 +2,7 @@ package com.singularitycoder.rememberme
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
+import android.media.ThumbnailUtils
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
@@ -75,7 +75,9 @@ class MainActivity : AppCompatActivity() {
         if (requestCode != REQUEST_CODE_VIDEO) return
         if (resultCode != Activity.RESULT_OK) return
         data ?: return
+        val thumbnailBitmap = ThumbnailUtils.createVideoThumbnail(takenVideoFile.path, MediaStore.Images.Thumbnails.MINI_KIND)
         println("originalVideoPath: ${takenVideoFile.absolutePath}")
+
         // TODO Launch Bottom sheet
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -131,6 +133,7 @@ class MainActivity : AppCompatActivity() {
                 showToast("Why, What, When, Where and How you met this person?")
             }
         }
+        // https://stackoverflow.com/questions/32038332/using-google-design-library-how-to-hide-fab-button-on-scroll-down
         rvContacts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
