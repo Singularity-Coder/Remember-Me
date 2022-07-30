@@ -3,14 +3,15 @@ package com.singularitycoder.rememberme
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.singularitycoder.rememberme.databinding.ListItemContactBinding
 
-class ContactsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var contactsList = emptyList<Contact>()
-    private var callClickListener: (contact: Contact) -> Unit = {}
+    private var itemClickListener: (contact: Contact) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val itemBinding = ListItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -25,8 +26,8 @@ class ContactsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int = position
 
-    fun setCallClickListener(listener: (contact: Contact) -> Unit) {
-        callClickListener = listener
+    fun setItemClickListener(listener: (contact: Contact) -> Unit) {
+        itemClickListener = listener
     }
 
     inner class ContactViewHolder(
@@ -38,10 +39,10 @@ class ContactsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 tvContactName.text = contact.name
                 tvContactPhoneNumber.text = contact.mobileNumber
                 tvDateAdded.text = contact.dateAdded.toIntuitiveDateTime()
-                ivCall.setOnClickListener {
-                    callClickListener.invoke(contact)
+                ivImage.setOnClickListener {
+                    itemClickListener.invoke(contact)
                 }
-                ivImage.load(contact.photo) {
+                ivImage.load(contact.imagePath.toUri()) {
                     placeholder(R.drawable.ic_placeholder)
                 }
             }

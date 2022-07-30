@@ -9,10 +9,14 @@ import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.Point
+import android.hardware.Camera
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +33,9 @@ import java.util.concurrent.TimeUnit
 
 const val DB_CONTACT = "db_contact"
 const val TABLE_CONTACT = "table_contact"
+
+const val FILE_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider"
+const val REQUEST_CODE_VIDEO = 1001
 
 fun View.showSnackBar(
     message: String,
@@ -100,6 +107,9 @@ inline fun deleteAllFilesFrom(
     }
 }
 
+fun Context.isCameraPresent(): Boolean {
+    return packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+}
 
 // Get Epoch Time
 val timeNow: Long
@@ -138,7 +148,8 @@ val mainActivityPermissions = arrayOf(
     Manifest.permission.WRITE_CONTACTS,
     Manifest.permission.READ_EXTERNAL_STORAGE,
     Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    Manifest.permission.RECORD_AUDIO
+    Manifest.permission.RECORD_AUDIO,
+    Manifest.permission.CAMERA,
 )
 
 fun Context.hasContactPermission(): Boolean = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED &&
@@ -164,9 +175,9 @@ fun Context.getContacts(): List<Contact> {
                 val photoURI = Uri.withAppendedPath(person, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
                 while (cursorInfo?.moveToNext() == true) {
                     val info = Contact().apply {
-                        this.id = id
                         this.name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME) ?: 0)
                         this.mobileNumber = cursorInfo.getString(cursorInfo.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER) ?: 0)
+                        this.imagePath = photoURI.toString()
                         this.photo = if (inputStream != null) BitmapFactory.decodeStream(inputStream) else null
                         this.photoURI = photoURI
                     }
@@ -185,6 +196,35 @@ fun Context.showPermissionSettings() {
         data = Uri.fromParts("package", this@showPermissionSettings.packageName, null)
     }
     startActivity(intent)
+}
+
+fun Context.showToast(
+    message: String,
+    duration: Int = Toast.LENGTH_LONG,
+) = Toast.makeText(this, message, duration).show()
+
+fun doAfter(duration: Long, task: () -> Unit) {
+    Handler(Looper.getMainLooper()).postDelayed(task, duration)
+}
+
+fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+fun openFrontFacingCameraGingerbread(): Camera? {
+    var cameraCount = 0
+    var cam: Camera? = null
+    val cameraInfo = Camera.CameraInfo()
+    cameraCount = Camera.getNumberOfCameras()
+    for (camIdx in 0 until cameraCount) {
+        Camera.getCameraInfo(camIdx, cameraInfo)
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            try {
+                cam = Camera.open(camIdx)
+            } catch (e: RuntimeException) {
+                println("Camera failed to open: $e")
+            }
+        }
+    }
+    return cam
 }
 
 enum class DateType(val value: String) {

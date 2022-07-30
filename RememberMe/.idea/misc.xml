@@ -4,10 +4,14 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable-v24/ic_placeholder.xml" value="0.111" />
+        <entry key="app/src/main/res/drawable/background_rounded_toast.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_placeholder.xml" value="0.111" />
         <entry key="app/src/main/res/drawable/ic_round_call_24.xml" value="0.111" />
         <entry key="app/src/main/res/drawable/ic_round_people_24.xml" value="0.111" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.19610507246376813" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.14150943396226415" />
+        <entry key="app/src/main/res/layout/layout_custom_toast.xml" value="0.1" />
         <entry key="app/src/main/res/layout/list_item_contact.xml" value="0.2105497087751116" />
+        <entry key="app/src/main/res/xml/file_paths.xml" value="0.1" />
       </map>
     </option>
   </component>

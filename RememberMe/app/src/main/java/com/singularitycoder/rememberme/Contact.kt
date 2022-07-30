@@ -9,12 +9,12 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = TABLE_CONTACT)
 data class Contact(
-    @PrimaryKey @ColumnInfo(name = "id") var id: String,
     @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "mobileNumber") var mobileNumber: String,
+    @PrimaryKey @ColumnInfo(name = "mobileNumber") var mobileNumber: String,
     @ColumnInfo(name = "dateAdded") var dateAdded: Long,
+    @ColumnInfo(name = "imagePath") var imagePath: String,
     @Ignore var photo: Bitmap? = null,
     @Ignore var photoURI: Uri? = null,
 ) {
-    constructor() : this("", "", "", 0,null, null)
+    constructor() : this("", "", 0, "", null, null)
 }

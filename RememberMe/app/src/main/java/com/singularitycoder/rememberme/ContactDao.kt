@@ -7,14 +7,14 @@ import androidx.room.*
 interface ContactDao {
 
     // Single Item CRUD ops ------------------------------------------------------------------------------------------------------------------------
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(contact: Contact)
 
     @Transaction
-    @Query("SELECT * FROM $TABLE_CONTACT WHERE id LIKE :id LIMIT 1")
-    suspend fun getContactById(id: String): Contact?
+    @Query("SELECT * FROM $TABLE_CONTACT WHERE mobileNumber LIKE :mobileNumber LIMIT 1")
+    suspend fun getContactByPhone(mobileNumber: String): Contact?
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun update(contact: Contact)
 
     @Delete
@@ -23,7 +23,7 @@ interface ContactDao {
     // ---------------------------------------------------------------------------------------------------------------------------------------------
 
     // All of the parameters of the Insert method must either be classes annotated with Entity or collections/array of it.
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(contactList: List<Contact>)
 
     @Query("SELECT * FROM $TABLE_CONTACT")
