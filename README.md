@@ -1,3 +1,4 @@
+![alt text](https://github.com/Singularity-Coder/Remember-Me/blob/main/assets/logo192.png)
 # Remember-Me
 You will never forget a face again!
 
