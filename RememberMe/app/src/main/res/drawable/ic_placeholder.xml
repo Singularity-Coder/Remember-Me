@@ -17,10 +17,10 @@
     <item
         android:width="36dp"
         android:height="36dp"
-        android:bottom="24dp"
-        android:drawable="@drawable/ic_round_people_24"
-        android:end="24dp"
         android:gravity="center"
+        android:drawable="@drawable/ic_round_people_24"
+        android:bottom="24dp"
+        android:end="24dp"
         android:start="24dp"
         android:top="24dp" />
 </layer-list>
