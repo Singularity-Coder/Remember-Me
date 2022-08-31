@@ -1,15 +1,18 @@
 package com.singularitycoder.rememberme
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.media.ThumbnailUtils
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -22,7 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-
 
 // Sync Contacts - Worker
 // Alphabet strip
@@ -39,9 +41,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var takenVideoFile: File
 
+    private val duplicateContactsList = mutableListOf<Contact>()
     private val contactsAdapter = ContactsAdapter()
     private val mainActivityPermissionsResult = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions: Map<String, @JvmSuppressWildcards Boolean>? ->
         permissions ?: return@registerForActivityResult
+        val isAllPermissionsGranted = permissions.entries.all { it.value }
         permissions.entries.forEach { it: Map.Entry<String, @JvmSuppressWildcards Boolean> ->
             println("Permission status: ${it.key} = ${it.value}")
             val permission = it.key
@@ -49,8 +53,22 @@ class MainActivity : AppCompatActivity() {
             when {
                 isGranted -> {
                     // disable blocking layout and proceed
-                    binding.setupUI()
-                    binding.setupUserActionListeners()
+                    if (permission != Manifest.permission.READ_CONTACTS) return@forEach
+                    CoroutineScope(IO).launch {
+                        getContacts().sortedBy { it.name }.forEach { it: Contact ->
+                            println("is called")
+                            dao.insert(it)
+                        }
+                        withContext(Main) {
+                            contactsAdapter.apply {
+                                this.contactsList = dao.getAll()
+                                duplicateContactsList.clear()
+                                duplicateContactsList.addAll(dao.getAll())
+                                notifyDataSetChanged()
+                                binding.progressCircular.isVisible = false
+                            }
+                        }
+                    }
                 }
                 ActivityCompat.shouldShowRequestPermissionRationale(this, permission) -> {
                     // permission permanently denied. Show settings dialog enable blocking layout and show popup to go to settings
@@ -67,6 +85,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.setupUI()
+        binding.setupUserActionListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
         grantPermissions()
     }
 
@@ -92,23 +116,22 @@ class MainActivity : AppCompatActivity() {
             adapter = contactsAdapter
         }
         progressCircular.isVisible = true
-        CoroutineScope(IO).launch {
-            getContacts().sortedBy { it.name }.forEach { it: Contact ->
-                dao.insert(it)
-            }
-            withContext(Main) {
-                contactsAdapter.apply {
-                    this.contactsList = dao.getAll()
-                    notifyDataSetChanged()
-                    progressCircular.isVisible = false
-                }
-            }
-        }
     }
 
     private fun ActivityMainBinding.setupUserActionListeners() {
+        etSearch.doAfterTextChanged { keyWord: Editable? ->
+            ibClearSearch.isVisible = keyWord.isNullOrBlank().not()
+            if (keyWord.isNullOrBlank()) {
+                contactsAdapter.contactsList = duplicateContactsList
+            } else {
+                contactsAdapter.contactsList = contactsAdapter.contactsList.filter { it: Contact -> it.name.contains(keyWord) }
+            }
+            contactsAdapter.notifyDataSetChanged()
+        }
+        ibClearSearch.setOnClickListener {
+            etSearch.setText("")
+        }
         contactsAdapter.setItemClickListener {
-
         }
         fabAddContact.setOnClickListener {
             if (isCameraPresent().not()) {

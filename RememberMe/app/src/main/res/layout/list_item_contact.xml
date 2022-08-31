@@ -6,15 +6,16 @@
 
     <TextView
         android:id="@+id/tv_contact_name"
-        style="@style/TextAppearance.AppCompat.Body2"
+        style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:marqueeRepeatLimit="marquee_forever"
         android:maxLines="1"
+        android:textStyle="bold"
         android:text="Contact Name"
         android:textColor="@color/title_color"
         app:layout_constraintEnd_toStartOf="@+id/card_image"
@@ -48,25 +49,20 @@
         android:marqueeRepeatLimit="marquee_forever"
         android:maxLines="1"
         android:text="Date"
+        android:visibility="gone"
         android:textColor="@android:color/darker_gray"
         app:layout_constraintEnd_toStartOf="@+id/card_image"
         app:layout_constraintStart_toStartOf="@+id/tv_contact_name"
         app:layout_constraintTop_toBottomOf="@+id/tv_contact_phone_number" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_date_added" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         app:cardCornerRadius="48dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -75,8 +71,8 @@
 
         <ImageView
             android:id="@+id/iv_image"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
             android:background="@drawable/ic_placeholder"
             android:scaleType="centerCrop" />
     </com.google.android.material.card.MaterialCardView>

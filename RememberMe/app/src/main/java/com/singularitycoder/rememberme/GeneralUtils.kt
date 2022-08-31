@@ -149,10 +149,10 @@ infix fun Long.toTimeOfType(type: DateType): String {
 
 val mainActivityPermissions = arrayOf(
     Manifest.permission.READ_CONTACTS,
-    Manifest.permission.WRITE_CONTACTS,
-    Manifest.permission.READ_EXTERNAL_STORAGE,
-    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    Manifest.permission.RECORD_AUDIO,
+//    Manifest.permission.WRITE_CONTACTS,
+//    Manifest.permission.READ_EXTERNAL_STORAGE,
+//    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//    Manifest.permission.RECORD_AUDIO,
     Manifest.permission.CAMERA,
 )
 
