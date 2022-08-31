@@ -148,7 +148,9 @@ class MainActivity : AppCompatActivity() {
         ibClearSearch.setOnClickListener {
             etSearch.setText("")
         }
-        contactsAdapter.setItemClickListener {
+        contactsAdapter.setItemClickListener { it: Contact ->
+        }
+        contactsAdapter.setEditContactClickListener { it: Contact ->
         }
         fabAddContact.setOnClickListener {
             if (isCameraPresent().not()) {
