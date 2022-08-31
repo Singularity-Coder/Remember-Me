@@ -136,7 +136,6 @@
                 android:id="@+id/iv_whatsapp"
                 android:layout_width="96dp"
                 android:layout_height="50dp"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:padding="12dp"
