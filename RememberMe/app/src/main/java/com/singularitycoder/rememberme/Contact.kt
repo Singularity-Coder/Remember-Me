@@ -15,6 +15,7 @@ data class Contact(
     @ColumnInfo(name = "imagePath") var imagePath: String,
     @Ignore var photo: Bitmap? = null,
     @Ignore var photoURI: Uri? = null,
+    @Ignore var isAlphabetShown: Boolean = false,
 ) {
     constructor() : this("", "", 0, "", null, null)
 }

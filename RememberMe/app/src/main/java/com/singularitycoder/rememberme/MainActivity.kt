@@ -56,17 +56,34 @@ class MainActivity : AppCompatActivity() {
                     if (permission != Manifest.permission.READ_CONTACTS) return@forEach
                     CoroutineScope(IO).launch {
                         getContacts().sortedBy { it.name }.forEach { it: Contact ->
-                            println("is called")
                             dao.insert(it)
                         }
+                        val sortedContactList = ArrayList<Contact>()
+                        val contactsMap = HashMap<String, ArrayList<Contact>>()
+                        dao.getAll().forEach { it: Contact ->
+                            contactsMap.put(
+                                it.name.subSequence(0, 1).toString(),
+                                contactsMap.get(it.name.subSequence(0, 1).toString())?.apply {
+                                    add(it)
+                                } ?: ArrayList<Contact>().apply {
+                                    add(it)
+                                }
+                            )
+                        }
+                        contactsMap.keys.sorted().forEach { it: String ->
+                            val preparedList = contactsMap.get(it)?.mapIndexed { index, contact ->
+                                if (index == 0) contact.isAlphabetShown = true
+                                contact
+                            } ?: emptyList()
+                            sortedContactList.addAll(preparedList)
+                        }
+                        contactsAdapter.contactsList = sortedContactList
+                        duplicateContactsList.clear()
+                        duplicateContactsList.addAll(dao.getAll())
+
                         withContext(Main) {
-                            contactsAdapter.apply {
-                                this.contactsList = dao.getAll()
-                                duplicateContactsList.clear()
-                                duplicateContactsList.addAll(dao.getAll())
-                                notifyDataSetChanged()
-                                binding.progressCircular.isVisible = false
-                            }
+                            contactsAdapter.notifyDataSetChanged()
+                            binding.progressCircular.isVisible = false
                         }
                     }
                 }

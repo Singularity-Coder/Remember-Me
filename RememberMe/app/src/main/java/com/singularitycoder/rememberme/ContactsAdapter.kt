@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.singularitycoder.rememberme.databinding.ListItemContactBinding
@@ -36,6 +37,8 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         @SuppressLint("SetTextI18n")
         fun setData(contact: Contact) {
             itemBinding.apply {
+                tvAlphabet.isVisible = contact.isAlphabetShown
+                tvAlphabet.text = contact.name.subSequence(0, 1)
                 tvContactName.text = contact.name
                 tvContactPhoneNumber.text = contact.mobileNumber
                 tvDateAdded.text = contact.dateAdded.toIntuitiveDateTime()
