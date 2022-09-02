@@ -63,13 +63,13 @@ class AddContactBottomSheetFragment : BottomSheetDialogFragment() {
     // https://stackoverflow.com/questions/40616833/bottomsheetdialogfragment-listen-to-dismissed-by-user-event
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        viewModel.contactAccidentBackupLiveData.value = Contact(
-            name = binding.etName.editText?.text.toString(),
-            mobileNumber = binding.etPhoneNumber.editText?.text.toString(),
-            dateAdded = timeNow,
-            imagePath = "",
-            videoPath = ""
-        )
+//        viewModel.contactAccidentBackupLiveData.value = Contact(
+//            name = binding.etName.editText?.text.toString(),
+//            mobileNumber = binding.etPhoneNumber.editText?.text.toString(),
+//            dateAdded = timeNow,
+//            imagePath = "",
+//            videoPath = ""
+//        )
     }
 
     private fun FragmentAddContactBottomSheetBinding.setupUI() {
@@ -132,10 +132,10 @@ class AddContactBottomSheetFragment : BottomSheetDialogFragment() {
     private fun FragmentAddContactBottomSheetBinding.observeForData() {
         viewModel.contactAccidentBackupLiveData.observe(viewLifecycleOwner) { it: Contact? ->
             it ?: return@observe
-            if (userAction == UserAction.UPDATE) {
-                etName.editText?.setText(viewModel.contactAccidentBackupLiveData.value?.name)
-                etPhoneNumber.editText?.setText(viewModel.contactAccidentBackupLiveData.value?.mobileNumber)
-            }
+//            if (userAction == UserAction.UPDATE) {
+//                etName.editText?.setText(viewModel.contactAccidentBackupLiveData.value?.name)
+//                etPhoneNumber.editText?.setText(viewModel.contactAccidentBackupLiveData.value?.mobileNumber)
+//            }
         }
     }
 
