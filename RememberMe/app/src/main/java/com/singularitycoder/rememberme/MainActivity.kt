@@ -187,6 +187,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+        tvAppName.setOnClickListener {
+            rvContacts.smoothScrollToPosition(0)
+        }
+        contactsAdapter.setItemClickListener { contact: Contact, isExpanded: Boolean ->
+            tvAlphabet.isVisible = linearLayoutManager.findFirstVisibleItemPosition() != 0
+            tvAlphabet.isVisible = isExpanded.not()
+        }
     }
 
     private fun grantContactsPermissions() {

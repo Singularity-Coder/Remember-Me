@@ -15,8 +15,8 @@
     </item>
 
     <item
-        android:width="38dp"
-        android:height="38dp"
+        android:width="32dp"
+        android:height="32dp"
         android:bottom="24dp"
         android:drawable="@drawable/ic_round_people_24"
         android:end="24dp"

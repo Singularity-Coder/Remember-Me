@@ -21,6 +21,7 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var closedCardPosition: Int = -1
 
     var contactsList = emptyList<Contact>()
+    private var itemClickListener: (contact: Contact, isExpanded: Boolean) -> Unit = { contact, isExpanded -> }
     private var imageClickListener: (contact: Contact) -> Unit = {}
     private var editContactClickListener: (contact: Contact) -> Unit = {}
 
@@ -36,6 +37,10 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount(): Int = contactsList.size
 
     override fun getItemViewType(position: Int): Int = position
+
+    fun setItemClickListener(listener: (contact: Contact, isExpanded: Boolean) -> Unit) {
+        itemClickListener = listener
+    }
 
     fun setImageClickListener(listener: (contact: Contact) -> Unit) {
         imageClickListener = listener
@@ -65,24 +70,27 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         withContext(Main) {
                             ivImage.load(videoBitmap) {
                                 placeholder(R.drawable.ic_placeholder)
-                                error(R.drawable.ic_placeholder)
+//                                error(R.drawable.ic_placeholder)
                             }
                         }
                     }
                 } else {
                     ivImage.load(contact.imagePath.toUri()) {
                         placeholder(R.drawable.ic_placeholder)
-                        error(R.drawable.ic_placeholder)
+//                        error(R.drawable.ic_placeholder)
                     }
                 }
                 root.setOnClickListener {
                     if (openCardPosition != -1 && openCardPosition != closedCardPosition) {
                         clContact.isVisible = true
+                        itemClickListener.invoke(contact, false)
                         layoutListItemContactExpanded.root.isVisible = false
                         notifyItemChanged(openCardPosition)
                         closedCardPosition = openCardPosition
+                        return@setOnClickListener
                     }
                     clContact.isVisible = false
+                    itemClickListener.invoke(contact, true)
                     layoutListItemContactExpanded.root.isVisible = true
                     openCardPosition = bindingAdapterPosition
                 }
@@ -101,14 +109,14 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         withContext(Main) {
                             ivImage.load(videoBitmap) {
                                 placeholder(R.drawable.ic_placeholder)
-                                error(R.drawable.ic_placeholder)
+//                                error(R.drawable.ic_placeholder)
                             }
                         }
                     }
                 } else {
                     ivImage.load(contact.imagePath.toUri()) {
                         placeholder(R.drawable.ic_placeholder)
-                        error(R.drawable.ic_placeholder)
+//                        error(R.drawable.ic_placeholder)
                     }
                 }
                 tvEditContact.setOnClickListener {
