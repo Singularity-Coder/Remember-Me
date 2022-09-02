@@ -17,6 +17,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.14150943396226415" />
         <entry key="app/src/main/res/layout/fragment_add_contact_bottom_sheet.xml" value="0.18024691358024691" />
         <entry key="app/src/main/res/layout/fragment_video.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_video_bottom_sheet.xml" value="0.1" />
         <entry key="app/src/main/res/layout/layout_custom_toast.xml" value="0.1" />
         <entry key="app/src/main/res/layout/list_item_contact.xml" value="0.20221606648199447" />
         <entry key="app/src/main/res/layout/list_item_contact_expanded.xml" value="0.25" />
