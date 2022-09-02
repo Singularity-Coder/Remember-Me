@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/cl_home_container"
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,6 +88,21 @@
             app:layout_constraintVertical_bias="1.0"
             tools:layout_editor_absoluteX="65dp"
             tools:listitem="@layout/list_item_contact" />
+
+        <TextView
+            android:id="@+id/tv_alphabet"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black_50"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"
+            android:text="A"
+            android:textColor="@android:color/darker_gray"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@+id/rv_contacts"/>
 
         <ProgressBar
             android:id="@+id/progress_circular"

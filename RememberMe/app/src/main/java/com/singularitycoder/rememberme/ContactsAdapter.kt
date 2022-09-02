@@ -1,6 +1,7 @@
 package com.singularitycoder.rememberme
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
@@ -8,6 +9,11 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.singularitycoder.rememberme.databinding.ListItemContactBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -15,7 +21,7 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var closedCardPosition: Int = -1
 
     var contactsList = emptyList<Contact>()
-    private var itemClickListener: (contact: Contact) -> Unit = {}
+    private var imageClickListener: (contact: Contact) -> Unit = {}
     private var editContactClickListener: (contact: Contact) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -31,8 +37,8 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int = position
 
-    fun setItemClickListener(listener: (contact: Contact) -> Unit) {
-        itemClickListener = listener
+    fun setImageClickListener(listener: (contact: Contact) -> Unit) {
+        imageClickListener = listener
     }
 
     fun setEditContactClickListener(listener: (contact: Contact) -> Unit) {
@@ -51,10 +57,23 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 tvContactPhoneNumber.text = contact.mobileNumber
                 tvDateAdded.text = contact.dateAdded.toIntuitiveDateTime()
                 ivImage.setOnClickListener {
-                    itemClickListener.invoke(contact)
+                    imageClickListener.invoke(contact)
                 }
-                ivImage.load(contact.imagePath.toUri()) {
-                    placeholder(R.drawable.ic_placeholder)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    CoroutineScope(IO).launch {
+                        val videoBitmap = root.context.getVideoThumbnailBitmap(contact.videoPath.toUri())
+                        withContext(Main) {
+                            ivImage.load(videoBitmap) {
+                                placeholder(R.drawable.ic_placeholder)
+                                error(R.drawable.ic_placeholder)
+                            }
+                        }
+                    }
+                } else {
+                    ivImage.load(contact.imagePath.toUri()) {
+                        placeholder(R.drawable.ic_placeholder)
+                        error(R.drawable.ic_placeholder)
+                    }
                 }
                 root.setOnClickListener {
                     if (openCardPosition != -1 && openCardPosition != closedCardPosition) {
@@ -74,10 +93,23 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 tvContactPhoneNumber.text = contact.mobileNumber
                 tvDateAdded.text = contact.dateAdded.toIntuitiveDateTime()
                 ivImage.setOnClickListener {
-                    itemClickListener.invoke(contact)
+                    imageClickListener.invoke(contact)
                 }
-                ivImage.load(contact.imagePath.toUri()) {
-                    placeholder(R.drawable.ic_placeholder)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    CoroutineScope(IO).launch {
+                        val videoBitmap = root.context.getVideoThumbnailBitmap(contact.videoPath.toUri())
+                        withContext(Main) {
+                            ivImage.load(videoBitmap) {
+                                placeholder(R.drawable.ic_placeholder)
+                                error(R.drawable.ic_placeholder)
+                            }
+                        }
+                    }
+                } else {
+                    ivImage.load(contact.imagePath.toUri()) {
+                        placeholder(R.drawable.ic_placeholder)
+                        error(R.drawable.ic_placeholder)
+                    }
                 }
                 tvEditContact.setOnClickListener {
                     editContactClickListener.invoke(contact)

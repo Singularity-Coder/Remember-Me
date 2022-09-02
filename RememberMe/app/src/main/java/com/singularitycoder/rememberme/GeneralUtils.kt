@@ -10,17 +10,25 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
+import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -28,18 +36,20 @@ import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 import java.io.File
 import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
 const val DB_CONTACT = "db_contact"
 const val TABLE_CONTACT = "table_contact"
 
 const val FILE_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider"
 const val REQUEST_CODE_VIDEO = 1001
+const val TAG_ADD_CONTACT_MODAL_BOTTOM_SHEET = "TAG_ADD_CONTACT_MODAL_BOTTOM_SHEET"
+const val TAG_VIDEO_MODAL_BOTTOM_SHEET = "TAG_VIDEO_MODAL_BOTTOM_SHEET"
 
 fun View.showSnackBar(
     message: String,
@@ -216,9 +226,18 @@ fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).to
 // https://stackoverflow.com/questions/44109057/get-video-thumbnail-from-uri
 @RequiresApi(Build.VERSION_CODES.O_MR1)
 fun Context.getVideoThumbnailBitmap(docUri: Uri): Bitmap? {
-    val mmr = MediaMetadataRetriever()
-    mmr.setDataSource(this, docUri)
-    return mmr.getScaledFrameAtTime(/* Time in Video */1000, MediaMetadataRetriever.OPTION_NEXT_SYNC, 128, 128)
+    return try {
+        val mmr = MediaMetadataRetriever()
+        mmr.setDataSource(this, docUri)
+        mmr.getScaledFrameAtTime(
+            1000, /* Time in Video */
+            MediaMetadataRetriever.OPTION_NEXT_SYNC,
+            128,
+            128
+        )
+    } catch (e: Exception) {
+        null
+    }
 }
 
 // https://stackoverflow.com/questions/33222918/sharing-bitmap-via-android-intent
@@ -246,9 +265,8 @@ fun Context.makeCall(phoneNum: String) {
 
 fun Context.sendSms(phoneNum: String) = try {
     val smsIntent = Intent(Intent.ACTION_VIEW).apply {
-        type = "vnd.android-dir/mms-sms"
-        putExtra("address", phoneNum)
-        putExtra("sms_body", "Message Body check")
+        data = Uri.parse("sms:$phoneNum")
+        putExtra("sms_body", "")
         addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
     }
     startActivity(smsIntent)
@@ -273,6 +291,33 @@ fun Context.sendWhatsAppMessage(whatsAppPhoneNum: String) {
     }
 }
 
+// https://stackoverflow.com/questions/37104960/bottomsheetdialog-with-transparent-background
+fun BottomSheetDialogFragment.setTransparentBackground() {
+    dialog?.apply {
+        // window?.setDimAmount(0.2f) // Set dim amount here
+        setOnShowListener {
+            val bottomSheet = findViewById<View?>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.setBackgroundResource(android.R.color.transparent)
+        }
+    }
+}
+
+fun Context.color(@ColorRes colorRes: Int) = ContextCompat.getColor(this, colorRes)
+
+fun Context.drawable(@DrawableRes drawableRes: Int): Drawable? =
+    ContextCompat.getDrawable(this, drawableRes)
+
+fun AppCompatActivity.showScreen(
+    fragment: Fragment,
+    tag: String
+) {
+    supportFragmentManager.beginTransaction()
+        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        .add(R.id.cl_home_container, fragment, tag)
+        .addToBackStack(null)
+        .commit()
+}
+
 enum class DateType(val value: String) {
     dd_MMM_yyyy(value = "dd MMM yyyy"),
     dd_MMM_yyyy_h_mm_a(value = "dd-MMM-yyyy h:mm a"),
@@ -280,4 +325,11 @@ enum class DateType(val value: String) {
     dd_MMM_yyyy_hh_mm_ss_a(value = "dd MMM yyyy, hh:mm:ss a"),
     dd_MMM_yyyy_h_mm_ss_aaa(value = "dd MMM yyyy, h:mm:ss aaa"),
     yyyy_MM_dd_T_HH_mm_ss_SS_Z(value = "yyyy-MM-dd'T'HH:mm:ss.SS'Z'")
+}
+
+@Parcelize
+enum class UserAction : Parcelable {
+    ADD,
+    UPDATE,
+    DELETE
 }

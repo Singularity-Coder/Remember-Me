@@ -15,12 +15,12 @@
     </item>
 
     <item
-        android:width="32dp"
-        android:height="32dp"
-        android:gravity="center"
-        android:drawable="@drawable/ic_round_people_24"
+        android:width="28dp"
+        android:height="28dp"
         android:bottom="24dp"
+        android:drawable="@drawable/ic_round_people_24"
         android:end="24dp"
+        android:gravity="center"
         android:start="24dp"
         android:top="24dp" />
 </layer-list>
