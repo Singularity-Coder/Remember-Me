@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity() {
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode != REQUEST_CODE_VIDEO) return
         if (resultCode != Activity.RESULT_OK) return
         data ?: return
@@ -135,7 +136,6 @@ class MainActivity : AppCompatActivity() {
             userAction = if (isRetake) UserAction.UPDATE else UserAction.ADD
         ).show(supportFragmentManager, TAG_ADD_CONTACT_MODAL_BOTTOM_SHEET)
         isRetake = false
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun ActivityMainBinding.setupUI() {
