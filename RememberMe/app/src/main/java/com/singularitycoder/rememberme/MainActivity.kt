@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             withContext(Main) {
                 contactsAdapter.notifyDataSetChanged()
                 binding.tvAlphabet.isVisible = contactsAdapter.contactsList.size > 5
-                binding.progressCircular.isVisible = false
+                binding.layoutShimmerContactLoader.shimmerLoader.isVisible = false
             }
         }
     }
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
             layoutManager = linearLayoutManager
             adapter = contactsAdapter
         }
-        progressCircular.isVisible = true
+        binding.layoutShimmerContactLoader.shimmerLoader.isVisible = true
     }
 
     private fun ActivityMainBinding.setupUserActionListeners() {
