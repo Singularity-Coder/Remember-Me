@@ -7,6 +7,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.singularitycoder.rememberme.helpers.TABLE_CONTACT
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

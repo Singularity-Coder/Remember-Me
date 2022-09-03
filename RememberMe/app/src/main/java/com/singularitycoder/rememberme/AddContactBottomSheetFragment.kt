@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputLayout
 import com.singularitycoder.rememberme.databinding.FragmentAddContactBottomSheetBinding
+import com.singularitycoder.rememberme.helpers.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,11 +26,13 @@ class AddContactBottomSheetFragment : BottomSheetDialogFragment() {
         @JvmStatic
         fun newInstance(
             contact: Contact?,
-            userAction: UserAction
+            userAction: UserAction,
+            adapterPosition: Int,
         ) = AddContactBottomSheetFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(ARG_PARAM_CONTACT, contact)
                 putParcelable(ARG_PARAM_USER_ACTION, userAction)
+                putInt(ARG_PARAM_ADAPTER_POSITION, adapterPosition)
             }
         }
     }
@@ -40,11 +43,13 @@ class AddContactBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var contact: Contact? = null
     private var userAction: UserAction? = null
+    private var adapterPosition: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         contact = arguments?.getParcelable<Contact>(ARG_PARAM_CONTACT)
         userAction = arguments?.getParcelable<UserAction>(ARG_PARAM_USER_ACTION)
+        adapterPosition = arguments?.getInt(ARG_PARAM_ADAPTER_POSITION) ?: 0
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -122,7 +127,7 @@ class AddContactBottomSheetFragment : BottomSheetDialogFragment() {
             )
             when (userAction) {
                 UserAction.ADD -> (activity as? MainActivity)?.addContact(contact)
-                UserAction.UPDATE -> (activity as? MainActivity)?.updateContact(contact)
+                UserAction.UPDATE -> (activity as? MainActivity)?.updateContact(contact, adapterPosition)
                 else -> Unit
             }
             dismiss()
@@ -175,3 +180,4 @@ class AddContactBottomSheetFragment : BottomSheetDialogFragment() {
 
 private const val ARG_PARAM_CONTACT = "ARG_PARAM_CONTACT"
 private const val ARG_PARAM_USER_ACTION = "ARG_PARAM_USER_ACTION"
+private const val ARG_PARAM_ADAPTER_POSITION = "ARG_PARAM_ADAPTER_POSITION"

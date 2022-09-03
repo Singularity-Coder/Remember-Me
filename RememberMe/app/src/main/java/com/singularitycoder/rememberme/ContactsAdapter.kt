@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.singularitycoder.rememberme.databinding.ListItemContactBinding
+import com.singularitycoder.rememberme.helpers.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -20,10 +21,10 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var openCardPosition: Int = -1
     private var closedCardPosition: Int = -1
 
-    var contactsList = emptyList<Contact>()
+    var contactsList = mutableListOf<Contact>()
     private var itemClickListener: (contact: Contact, isExpanded: Boolean) -> Unit = { contact, isExpanded -> }
     private var imageClickListener: (contact: Contact) -> Unit = {}
-    private var editContactClickListener: (contact: Contact) -> Unit = {}
+    private var editContactClickListener: (contact: Contact, position: Int) -> Unit = { contact, position -> }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val itemBinding = ListItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -46,7 +47,7 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         imageClickListener = listener
     }
 
-    fun setEditContactClickListener(listener: (contact: Contact) -> Unit) {
+    fun setEditContactClickListener(listener: (contact: Contact, position: Int) -> Unit) {
         editContactClickListener = listener
     }
 
@@ -65,19 +66,23 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     imageClickListener.invoke(contact)
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                    CoroutineScope(IO).launch {
-                        val videoBitmap = root.context.getVideoThumbnailBitmap(contact.videoPath.toUri())
-                        withContext(Main) {
-                            ivImage.load(videoBitmap) {
-                                placeholder(R.drawable.ic_placeholder)
+                    if (contact.videoPath.isNotBlank()) {
+                        CoroutineScope(IO).launch {
+                            val videoBitmap = root.context.getVideoThumbnailBitmap(contact.videoPath.toUri())
+                            withContext(Main) {
+                                ivImage.load(videoBitmap) {
+                                    placeholder(R.drawable.ic_placeholder)
 //                                error(R.drawable.ic_placeholder)
+                                }
                             }
                         }
                     }
                 } else {
-                    ivImage.load(contact.imagePath.toUri()) {
-                        placeholder(R.drawable.ic_placeholder)
+                    if (contact.imagePath.isNotBlank()) {
+                        ivImage.load(contact.imagePath.toUri()) {
+                            placeholder(R.drawable.ic_placeholder)
 //                        error(R.drawable.ic_placeholder)
+                        }
                     }
                 }
                 root.setOnClickListener {
@@ -103,24 +108,29 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 ivImage.setOnClickListener {
                     imageClickListener.invoke(contact)
                 }
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                    CoroutineScope(IO).launch {
-                        val videoBitmap = root.context.getVideoThumbnailBitmap(contact.videoPath.toUri())
-                        withContext(Main) {
-                            ivImage.load(videoBitmap) {
-                                placeholder(R.drawable.ic_placeholder)
+                    if (contact.videoPath.isNotBlank()) {
+                        CoroutineScope(IO).launch {
+                            val videoBitmap = root.context.getVideoThumbnailBitmap(contact.videoPath.toUri())
+                            withContext(Main) {
+                                ivImage.load(videoBitmap) {
+                                    placeholder(R.drawable.ic_placeholder)
 //                                error(R.drawable.ic_placeholder)
+                                }
                             }
                         }
                     }
                 } else {
-                    ivImage.load(contact.imagePath.toUri()) {
-                        placeholder(R.drawable.ic_placeholder)
+                    if (contact.imagePath.isNotBlank()) {
+                        ivImage.load(contact.imagePath.toUri()) {
+                            placeholder(R.drawable.ic_placeholder)
 //                        error(R.drawable.ic_placeholder)
+                        }
                     }
                 }
                 tvEditContact.setOnClickListener {
-                    editContactClickListener.invoke(contact)
+                    editContactClickListener.invoke(contact, bindingAdapterPosition)
                 }
                 ivWhatsapp.setOnClickListener {
                     root.context.sendWhatsAppMessage(whatsAppPhoneNum = contact.mobileNumber)

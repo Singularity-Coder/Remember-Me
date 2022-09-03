@@ -19,6 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.singularitycoder.rememberme.databinding.FragmentVideoBottomSheetBinding
+import com.singularitycoder.rememberme.helpers.deviceHeight
 import dagger.hilt.android.AndroidEntryPoint
 
 

@@ -1,4 +1,4 @@
-package com.singularitycoder.rememberme
+package com.singularitycoder.rememberme.helpers
 
 import android.Manifest
 import android.content.ContentUris
@@ -31,6 +31,9 @@ import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.singularitycoder.rememberme.BuildConfig
+import com.singularitycoder.rememberme.Contact
+import com.singularitycoder.rememberme.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main

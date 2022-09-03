@@ -2,12 +2,13 @@ package com.singularitycoder.rememberme
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.singularitycoder.rememberme.helpers.TABLE_CONTACT
 
 @Dao
 interface ContactDao {
 
     // Single Item CRUD ops ------------------------------------------------------------------------------------------------------------------------
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(contact: Contact)
 
     @Transaction
@@ -23,7 +24,7 @@ interface ContactDao {
     // ---------------------------------------------------------------------------------------------------------------------------------------------
 
     // All of the parameters of the Insert method must either be classes annotated with Entity or collections/array of it.
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(contactList: List<Contact>)
 
     @Query("SELECT * FROM $TABLE_CONTACT")

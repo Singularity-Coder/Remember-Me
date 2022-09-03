@@ -2,9 +2,9 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_home_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/cl_home_container"
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -102,7 +102,8 @@
             android:text="A"
             android:textColor="@android:color/darker_gray"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@+id/rv_contacts"/>
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="@+id/rv_contacts" />
 
         <ProgressBar
             android:id="@+id/progress_circular"

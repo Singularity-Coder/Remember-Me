@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.media.ThumbnailUtils
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.singularitycoder.rememberme.databinding.ActivityMainBinding
+import com.singularitycoder.rememberme.helpers.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -25,12 +27,12 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
-// Sync Contacts - Worker
+// Sync Contacts every day at night or on phone start - Worker or foreground service - Contacts will replace existing edits
 // Alphabet strip
 // Custom square camera for group selfie videos for context, name, phone, context field just in case u r not able to video it
 // Data migration
-// Expanded card has video, name, phone, date added, call, message, whatsapp
 // Get data from viewmodel
+// Delete old videos on update
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -42,8 +44,9 @@ class MainActivity : AppCompatActivity() {
 
     private var isRetake = false
     private var retakeContact: Contact? = null
+    private var adapterPosition: Int = 0
 
-    private val duplicateContactsList = mutableListOf<Contact>()
+    private var duplicateContactsList = mutableListOf<Contact>()
     private val contactsAdapter = ContactsAdapter()
     private val contactsPermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isPermissionGranted: Boolean? ->
         isPermissionGranted ?: return@registerForActivityResult
@@ -52,9 +55,13 @@ class MainActivity : AppCompatActivity() {
             return@registerForActivityResult
         }
         CoroutineScope(IO).launch {
-            getContacts().sortedBy { it.name }.forEach { it: Contact ->
-                dao.insert(it)
+            val isContactsSynced = Preferences.read(this@MainActivity).getBoolean(Preferences.KEY_IS_CONTACTS_SYNCED, false)
+            if (isContactsSynced.not()) {
+                getContacts().sortedBy { it.name }.forEach { it: Contact ->
+                    dao.insert(it)
+                }
             }
+            Preferences.write(this@MainActivity).putBoolean(Preferences.KEY_IS_CONTACTS_SYNCED, true).apply()
             val sortedContactList = ArrayList<Contact>()
             val contactsMap = HashMap<String, ArrayList<Contact>>()
             dao.getAll().forEach { it: Contact ->
@@ -75,12 +82,11 @@ class MainActivity : AppCompatActivity() {
                 sortedContactList.addAll(preparedList)
             }
             contactsAdapter.contactsList = sortedContactList
-            duplicateContactsList.clear()
-            duplicateContactsList.addAll(sortedContactList)
+            duplicateContactsList = sortedContactList
 
             withContext(Main) {
                 contactsAdapter.notifyDataSetChanged()
-                if (contactsAdapter.contactsList.size < 5) binding.tvAlphabet.isVisible = false
+                binding.tvAlphabet.isVisible = contactsAdapter.contactsList.size > 5
                 binding.progressCircular.isVisible = false
             }
         }
@@ -123,6 +129,10 @@ class MainActivity : AppCompatActivity() {
         grantContactsPermissions()
     }
 
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -133,7 +143,8 @@ class MainActivity : AppCompatActivity() {
         println("originalVideoPath: ${takenVideoFile.absolutePath}")
         AddContactBottomSheetFragment.newInstance(
             contact = if (isRetake) retakeContact.apply { this?.videoPath = takenVideoFile.absolutePath } else Contact(videoPath = takenVideoFile.absolutePath),
-            userAction = if (isRetake) UserAction.UPDATE else UserAction.ADD
+            userAction = if (isRetake) UserAction.UPDATE else UserAction.ADD,
+            adapterPosition = if (isRetake) adapterPosition else 0
         ).show(supportFragmentManager, TAG_ADD_CONTACT_MODAL_BOTTOM_SHEET)
         isRetake = false
     }
@@ -154,7 +165,7 @@ class MainActivity : AppCompatActivity() {
             if (keyWord.isNullOrBlank()) {
                 contactsAdapter.contactsList = duplicateContactsList
             } else {
-                contactsAdapter.contactsList = contactsAdapter.contactsList.filter { it: Contact -> it.name.contains(keyWord) }
+                contactsAdapter.contactsList = contactsAdapter.contactsList.filter { it: Contact -> it.name.contains(keyWord) }.toMutableList()
             }
             contactsAdapter.notifyDataSetChanged()
         }
@@ -166,8 +177,8 @@ class MainActivity : AppCompatActivity() {
             VideoBottomSheetFragment.newInstance(videoPath = it.videoPath)
                 .show(supportFragmentManager, TAG_VIDEO_MODAL_BOTTOM_SHEET)
         }
-        contactsAdapter.setEditContactClickListener { it: Contact ->
-            AddContactBottomSheetFragment.newInstance(contact = it, userAction = UserAction.UPDATE)
+        contactsAdapter.setEditContactClickListener { contact: Contact, position: Int ->
+            AddContactBottomSheetFragment.newInstance(contact = contact, userAction = UserAction.UPDATE, position)
                 .show(supportFragmentManager, TAG_ADD_CONTACT_MODAL_BOTTOM_SHEET)
         }
         fabAddContact.setOnClickListener {
@@ -191,7 +202,6 @@ class MainActivity : AppCompatActivity() {
             rvContacts.smoothScrollToPosition(0)
         }
         contactsAdapter.setItemClickListener { contact: Contact, isExpanded: Boolean ->
-            tvAlphabet.isVisible = linearLayoutManager.findFirstVisibleItemPosition() != 0
             tvAlphabet.isVisible = isExpanded.not()
         }
     }
@@ -219,10 +229,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateContact(contact: Contact) {
+    fun updateContact(
+        contact: Contact,
+        adapterPosition: Int
+    ) {
         CoroutineScope(IO).launch {
             dao.update(contact)
             withContext(Main) {
+                this@MainActivity.adapterPosition = adapterPosition
+                contactsAdapter.contactsList.set(adapterPosition, contact)
+                contactsAdapter.notifyItemChanged(adapterPosition)
                 grantContactsPermissions()
             }
         }

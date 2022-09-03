@@ -2,6 +2,7 @@ package com.singularitycoder.rememberme
 
 import android.content.Context
 import androidx.room.Room
+import com.singularitycoder.rememberme.helpers.DB_CONTACT
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
