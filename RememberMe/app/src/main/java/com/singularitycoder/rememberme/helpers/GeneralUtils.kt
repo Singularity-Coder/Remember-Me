@@ -169,8 +169,7 @@ val mainActivityPermissions = arrayOf(
     Manifest.permission.CAMERA,
 )
 
-fun Context.hasContactPermission(): Boolean = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED &&
-        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CONTACTS) == PackageManager.PERMISSION_GRANTED
+fun Context.hasReadContactPermission(): Boolean = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
 
 // https://stackoverflow.com/questions/12562151/android-get-all-contacts
 fun Context.getContacts(): List<Contact> {

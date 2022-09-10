@@ -22,6 +22,7 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var closedCardPosition: Int = -1
 
     var contactsList = mutableListOf<Contact>()
+    private var itemLongClickListener: (contact: Contact, position: Int) -> Unit = { contact, position -> }
     private var itemClickListener: (contact: Contact, isExpanded: Boolean) -> Unit = { contact, isExpanded -> }
     private var imageClickListener: (contact: Contact) -> Unit = {}
     private var editContactClickListener: (contact: Contact, position: Int) -> Unit = { contact, position -> }
@@ -41,6 +42,10 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setItemClickListener(listener: (contact: Contact, isExpanded: Boolean) -> Unit) {
         itemClickListener = listener
+    }
+
+    fun setItemLongClickListener(listener: (contact: Contact, position: Int) -> Unit) {
+        itemLongClickListener = listener
     }
 
     fun setImageClickListener(listener: (contact: Contact) -> Unit) {
@@ -64,6 +69,10 @@ class ContactsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 tvDateAdded.text = contact.dateAdded.toIntuitiveDateTime()
                 ivImage.setOnClickListener {
                     imageClickListener.invoke(contact)
+                }
+                root.setOnLongClickListener {
+                    itemLongClickListener.invoke(contact, bindingAdapterPosition)
+                    false
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     if (contact.videoPath.isNotBlank()) {

@@ -10,11 +10,13 @@ import android.provider.MediaStore
 import android.text.Editable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.singularitycoder.rememberme.databinding.ActivityMainBinding
 import com.singularitycoder.rememberme.helpers.*
@@ -27,12 +29,16 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
-// Sync Contacts every day at night or on phone start - Worker or foreground service - Contacts will replace existing edits
+// FIXME https://stackoverflow.com/questions/62165994/waiting-for-a-blocking-gc-alloc-in-android-studio-logs
+
 // Alphabet strip
 // Custom square camera for group selfie videos for context, name, phone, context field just in case u r not able to video it
 // Data migration
 // Get data from viewmodel
 // Delete old videos on update
+
+// TODO extract voice from video and use it as text context. On video long press show popup
+
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -62,33 +68,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             Preferences.write(this@MainActivity).putBoolean(Preferences.KEY_IS_CONTACTS_SYNCED, true).apply()
-            val sortedContactList = ArrayList<Contact>()
-            val contactsMap = HashMap<String, ArrayList<Contact>>()
-            dao.getAll().forEach { it: Contact ->
-                contactsMap.put(
-                    it.name.subSequence(0, 1).toString(),
-                    contactsMap.get(it.name.subSequence(0, 1).toString())?.apply {
-                        add(it)
-                    } ?: ArrayList<Contact>().apply {
-                        add(it)
-                    }
-                )
-            }
-            contactsMap.keys.sorted().forEach { it: String ->
-                val preparedList = contactsMap.get(it)?.mapIndexed { index, contact ->
-                    if (index == 0) contact.isAlphabetShown = true
-                    contact
-                } ?: emptyList()
-                sortedContactList.addAll(preparedList)
-            }
-            contactsAdapter.contactsList = sortedContactList
-            duplicateContactsList = sortedContactList
-
-            withContext(Main) {
-                contactsAdapter.notifyDataSetChanged()
-                binding.tvAlphabet.isVisible = contactsAdapter.contactsList.size > 5
-                binding.layoutShimmerContactLoader.shimmerLoader.isVisible = false
-            }
+            getSortedContacts()
         }
     }
     private val cameraPermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isPermissionGranted: Boolean? ->
@@ -127,10 +107,12 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         grantContactsPermissions()
+        syncContacts()
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState, outPersistentState)
+        // This is fix for a weird crash
     }
 
     @Deprecated("Deprecated in Java")
@@ -194,6 +176,7 @@ class MainActivity : AppCompatActivity() {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 10) fabAddContact.hide() else if (dy < 10) fabAddContact.show()
                 if (contactsAdapter.contactsList.isNotEmpty()) {
+                    tvAlphabet.isVisible = true
                     tvAlphabet.text = contactsAdapter.contactsList.get(linearLayoutManager.findFirstVisibleItemPosition()).name.substring(0, 1)
                 }
             }
@@ -202,7 +185,71 @@ class MainActivity : AppCompatActivity() {
             rvContacts.smoothScrollToPosition(0)
         }
         contactsAdapter.setItemClickListener { contact: Contact, isExpanded: Boolean ->
-            tvAlphabet.isVisible = isExpanded.not()
+            tvAlphabet.isVisible = contact.mobileNumber != contactsAdapter.contactsList.firstOrNull()?.mobileNumber
+        }
+        contactsAdapter.setItemLongClickListener { contact: Contact, position: Int ->
+            MaterialAlertDialogBuilder(
+                this@MainActivity,
+                com.google.android.material.R.style.ThemeOverlay_MaterialComponents_Dialog
+            ).apply {
+                setCancelable(false)
+                setTitle("Delete contact")
+                setMessage("Do you want to delete \"${contact.name}\"? Careful! You cannot undo this action.")
+                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.alert_dialog_bg)
+                setPositiveButton("Delete") { dialog, int ->
+                    CoroutineScope(IO).launch {
+                        dao.delete(contact)
+                        withContext(Main) {
+                            contactsAdapter.contactsList.removeAt(position)
+                            contactsAdapter.notifyItemRemoved(position)
+                        }
+                    }
+                }
+                setNegativeButton("Cancel") { dialog, int ->
+                }
+                create()
+                show()
+            }
+        }
+    }
+
+    private suspend fun getSortedContacts() {
+        val sortedContactList = ArrayList<Contact>()
+        val contactsMap = HashMap<String, ArrayList<Contact>>()
+        dao.getAll().forEach { it: Contact ->
+            contactsMap.put(
+                it.name.subSequence(0, 1).toString(),
+                contactsMap.get(it.name.subSequence(0, 1).toString())?.apply {
+                    add(it)
+                } ?: ArrayList<Contact>().apply {
+                    add(it)
+                }
+            )
+        }
+        contactsMap.keys.sorted().forEach { it: String ->
+            val preparedList = contactsMap.get(it)?.mapIndexed { index, contact ->
+                if (index == 0) contact.isAlphabetShown = true
+                contact
+            } ?: emptyList()
+            sortedContactList.addAll(preparedList)
+        }
+        contactsAdapter.contactsList = sortedContactList
+        duplicateContactsList = sortedContactList
+
+        withContext(Main) {
+            contactsAdapter.notifyDataSetChanged()
+            binding.tvAlphabet.isVisible = contactsAdapter.contactsList.size > 5
+            binding.layoutShimmerContactLoader.shimmerLoader.isVisible = false
+        }
+    }
+
+    private fun syncContacts() {
+        if (this.hasReadContactPermission().not()) return
+        CoroutineScope(IO).launch {
+            getContacts().sortedBy { it.name }.forEach { it: Contact ->
+                dao.insert(it)
+            }
+            getSortedContacts()
         }
     }
 

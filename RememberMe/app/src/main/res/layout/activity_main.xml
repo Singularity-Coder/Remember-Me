@@ -124,7 +124,7 @@
         android:contentDescription="Add Contact"
         app:backgroundTint="@color/purple_500"
         app:fabSize="normal"
-        app:srcCompat="@drawable/ic_round_person_add_24"
+        app:srcCompat="@drawable/ic_round_add_24"
         app:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

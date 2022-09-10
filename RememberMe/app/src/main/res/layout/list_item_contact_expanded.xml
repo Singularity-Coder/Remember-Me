@@ -128,54 +128,48 @@
             android:id="@+id/ll_communicate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:gravity="center_horizontal"
+            android:weightSum="4"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider">
 
-            <ImageView
+            <!--https://stackoverflow.com/questions/54713087/how-to-center-icon-in-a-materialbutton-which-has-no-text-->
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/iv_whatsapp"
-                android:layout_width="96dp"
+                style="@style/Widget.App.Button.IconOnly"
+                android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:padding="12dp"
-                android:src="@drawable/ic_round_whatsapp_24"
-                app:tint="@color/purple_500" />
+                app:icon="@drawable/ic_round_whatsapp_24" />
 
-            <ImageView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/iv_call"
-                android:layout_width="96dp"
+                style="@style/Widget.App.Button.IconOnly"
+                android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:padding="12dp"
-                android:src="@drawable/ic_outline_call_24"
-                app:tint="@color/purple_500" />
+                app:icon="@drawable/ic_outline_call_24" />
 
-            <ImageView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/iv_sms"
-                android:layout_width="96dp"
+                style="@style/Widget.App.Button.IconOnly"
+                android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:padding="12dp"
-                android:src="@drawable/ic_outline_sms_24"
-                app:tint="@color/purple_500" />
+                app:icon="@drawable/ic_outline_sms_24" />
 
-            <ImageView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/iv_share"
-                android:layout_width="96dp"
+                style="@style/Widget.App.Button.IconOnly"
+                android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:padding="12dp"
-                android:src="@drawable/ic_outline_share_24"
-                app:tint="@color/purple_500" />
+                app:icon="@drawable/ic_outline_share_24" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

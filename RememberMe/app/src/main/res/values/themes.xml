@@ -18,4 +18,19 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">24dp</item>
     </style>
+
+    <style name="Widget.App.Button.IconOnly" parent="Widget.MaterialComponents.Button">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="elevation">0dp</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="iconTint">@color/purple_500</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
 </resources>

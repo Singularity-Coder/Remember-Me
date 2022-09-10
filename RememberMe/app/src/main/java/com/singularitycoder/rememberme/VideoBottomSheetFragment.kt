@@ -22,7 +22,6 @@ import com.singularitycoder.rememberme.databinding.FragmentVideoBottomSheetBindi
 import com.singularitycoder.rememberme.helpers.deviceHeight
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class VideoBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -56,19 +55,6 @@ class VideoBottomSheetFragment : BottomSheetDialogFragment() {
         binding.setupUI()
     }
 
-    private fun FragmentVideoBottomSheetBinding.setupUI() {
-        exoPlayerView.setOnClickListener {
-            exoPlayer ?: return@setOnClickListener
-            if (exoPlayer?.isPlaying == true) {
-                ivPlay.isVisible = true
-                exoPlayer?.pause()
-            } else {
-                ivPlay.isVisible = false
-                exoPlayer?.play()
-            }
-        }
-    }
-
     override fun onStart() {
         super.onStart()
         if (Util.SDK_INT > 23) initializePlayer()
@@ -88,36 +74,6 @@ class VideoBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onStop() {
         super.onStop()
         if (Util.SDK_INT > 23) releaseExoPlayer()
-    }
-
-    private fun setupExoPlayer() {
-        exoPlayer = ExoPlayer.Builder(requireContext()).build().also { it: ExoPlayer ->
-            binding.exoPlayerView.player = it
-        }.apply {
-//            val rawVideoUri = RawResourceDataSource.buildRawResourceUri(R.raw.video)
-            val mediaItem = MediaItem.fromUri(videoPath?.toUri() ?: Uri.EMPTY)
-            addMediaItem(mediaItem)
-            repeatMode = Player.REPEAT_MODE_ONE // Loop video
-//            volume = 0f // Mute Video
-            prepare()
-            play()
-        }
-    }
-
-    private fun initializePlayer() {
-        exoPlayer?.playWhenReady = isPlayWhenReady
-        exoPlayer?.seekTo(currentItem, playbackPosition)
-        exoPlayer?.prepare()
-    }
-
-    private fun releaseExoPlayer() {
-        exoPlayer?.let { exoPlayer ->
-            playbackPosition = exoPlayer.currentPosition
-            currentItem = exoPlayer.currentMediaItemIndex
-            isPlayWhenReady = exoPlayer.playWhenReady
-            exoPlayer.release()
-        }
-        exoPlayer = null
     }
 
     // https://stackoverflow.com/questions/42301845/android-bottom-sheet-after-state-changed
@@ -153,6 +109,49 @@ class VideoBottomSheetFragment : BottomSheetDialogFragment() {
             })
         })
         return dialog
+    }
+
+    private fun FragmentVideoBottomSheetBinding.setupUI() {
+        exoPlayerView.setOnClickListener {
+            exoPlayer ?: return@setOnClickListener
+            if (exoPlayer?.isPlaying == true) {
+                ivPlay.isVisible = true
+                exoPlayer?.pause()
+            } else {
+                ivPlay.isVisible = false
+                exoPlayer?.play()
+            }
+        }
+    }
+
+    private fun setupExoPlayer() {
+        exoPlayer = ExoPlayer.Builder(requireContext()).build().also { it: ExoPlayer ->
+            binding.exoPlayerView.player = it
+        }.apply {
+//            val rawVideoUri = RawResourceDataSource.buildRawResourceUri(R.raw.video)
+            val mediaItem = MediaItem.fromUri(videoPath?.toUri() ?: Uri.EMPTY)
+            addMediaItem(mediaItem)
+            repeatMode = Player.REPEAT_MODE_ONE // Loop video
+//            volume = 0f // Mute Video
+            prepare()
+            play()
+        }
+    }
+
+    private fun initializePlayer() {
+        exoPlayer?.playWhenReady = isPlayWhenReady
+        exoPlayer?.seekTo(currentItem, playbackPosition)
+        exoPlayer?.prepare()
+    }
+
+    private fun releaseExoPlayer() {
+        exoPlayer?.let { exoPlayer ->
+            playbackPosition = exoPlayer.currentPosition
+            currentItem = exoPlayer.currentMediaItemIndex
+            isPlayWhenReady = exoPlayer.playWhenReady
+            exoPlayer.release()
+        }
+        exoPlayer = null
     }
 }
 
