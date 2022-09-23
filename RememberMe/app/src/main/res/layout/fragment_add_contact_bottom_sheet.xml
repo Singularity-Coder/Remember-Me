@@ -61,21 +61,28 @@
             android:id="@+id/card_retake"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="-16dp"
-            android:layout_marginBottom="-16dp"
+            android:layout_marginEnd="-14dp"
+            android:layout_marginBottom="-14dp"
             android:clipChildren="true"
             android:clipToPadding="true"
             app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
+            app:cardElevation="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/card_video"
             app:layout_constraintEnd_toEndOf="@+id/card_video">
 
-            <ImageButton
-                android:id="@+id/ib_retake"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/round_replay_circle_filled_24"
-                android:backgroundTint="@color/purple_500" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="6dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ib_retake"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/ic_round_photo_camera_24"
+                    android:backgroundTint="@color/purple_500" />
+            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.textfield.TextInputLayout
