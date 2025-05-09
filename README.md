@@ -19,6 +19,7 @@ You will never forget a face again! This is a contacts App that allows you to ad
 - Architecture
   - MVVM Architecture (View - DataBinding - ViewModel - Model)
 - [Coil](https://github.com/coil-kt/coil): Image loading for Android and Compose Multiplatform.
+- [ExoPlayer](https://github.com/google/ExoPlayer): An extensible media player for Android.
 - [Material-Components](https://github.com/material-components/material-components-android): Material design components for building ripple animation, and CardView.
 - [jsoup](https://mvnrepository.com/artifact/org.jsoup/jsoup): jsoup is a Java library that simplifies working with real-world HTML and XML.
 
